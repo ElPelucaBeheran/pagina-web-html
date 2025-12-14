@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spyfall Web (corregido)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #111827;
+      padding: 24px;
+      border-radius: 16px;
+      text-align: center;
+      width: 340px;
+    }
+    input, button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Spyfall</h1>
+    <p id="text">Configurá la partida</p>
+
+    <label for="playersInput">Cantidad de jugadores</label>
+    <input id="playersInput" type="number" min="2" value="4">
+
+    <label for="spiesInput">Cantidad de espías (máx 10)</label>
+    <input id="spiesInput" type="number" min="1" max="10" value="1">
+
+    <button id="actionBtn">Empezar</button>
+  </div>
+
+  <script>
+    const locationsList = [
+      "Playa",
+      "Hospital",
+      "Escuela",
+      "Banco",
+      "Avión",
+      "Restaurante"
+    ];
+
+    let players = 0;
+    let spies = [];
+    let currentPlayer = 0;
+    let gameLocation = "";
+
+    const title = document.getElementById("title");
+    const text = document.getElementById("text");
+    const btn = document.getElementById("actionBtn");
+    const playersInput = document.getElementById("playersInput");
+    const spiesInput = document.getElementById("spiesInput");
+
+    // estado simple del flujo
+    let state = "setup"; // setup | show | pass
+
+    btn.addEventListener("click", handleClick);
+
+    function handleClick() {
+      if (state === "setup") startGame();
+      else if (state === "show") passPhone();
+      else if (state === "pass") showCard();
+      else if (state === "reset") resetGame();
+    }
+
+    function startGame() {
+      players = Number(playersInput.value);
+      const spyCount = Math.min(Number(spiesInput.value), 10);
+
+      if (players < 2 || spyCount < 1 || spyCount >= players) {
+        alert("Datos inválidos");
+        return;
+      }
+
+      spies = [];
+      while (spies.length < spyCount) {
+        const r = Math.floor(Math.random() * players);
+        if (!spies.includes(r)) spies.push(r);
+      }
+
+      gameLocation = locationsList[Math.floor(Math.random() * locationsList.length)];
+      currentPlayer = 0;
+
+      playersInput.style.display = "none";
+      spiesInput.style.display = "none";
+
+      showCard();
+    }
+
+    function showCard() {
+      title.textContent = `Jugador ${currentPlayer + 1}`;
+
+      if (spies.includes(currentPlayer)) {
+        text.textContent = "Sos ESPÍA";
+      } else {
+        text.textContent = `Lugar: ${gameLocation}`;
+      }
+
+      btn.textContent = "Siguiente jugador";
+      state = "show";
+    }
+
+    function passPhone() {
+      currentPlayer++;
+
+      if (currentPlayer >= players) {
+        title.textContent = "Listo";
+        text.textContent = "Todos recibieron su carta. Empieza el juego.";
+        btn.textContent = "Resetear";
+        btn.style.display = "block";
+        state = "reset";
+        return;
+      }
+
+      title.textContent = "Pasá el celular";
+      text.textContent = "Tocá para ver tu carta";
+      btn.textContent = "Mostrar carta";
+      state = "pass";
+    }
+      function resetGame() {
+      // volver al estado inicial
+      title.textContent = "Spyfall";
+      text.textContent = "Configurá la partida";
+
+      playersInput.style.display = "block";
+      spiesInput.style.display = "block";
+
+      btn.textContent = "Empezar";
+      btn.style.display = "block";
+
+      players = 0;
+      spies = [];
+      currentPlayer = 0;
+      gameLocation = "";
+      state = "setup";
+    }
+  </script>
+</body>
+</html>
