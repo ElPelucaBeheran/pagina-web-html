@@ -260,7 +260,8 @@
 
       spies = [];
       while (spies.length < spyCount) {
-        const r = Math.floor(Math.random() * players);
+        // Excluir al jugador 0 (primera persona) de ser espía
+        const r = Math.floor(Math.random() * (players - 1)) + 1;
         if (!spies.includes(r)) spies.push(r);
       }
 
